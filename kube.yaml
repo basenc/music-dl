@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: music-dl
+  labels:
+    traefik.enable: "true"
+    traefik.http.routers.nai_discord_bot.rule: "Host(`mdl.awoo.moe`)"
+    traefik.http.routers.nai_discord_bot.entrypoints: "websecure"
+    traefik.http.routers.nai_discord_bot.tls.certresolver: "le"
+    traefik.http.services.nai_discord_bot.loadbalancer.server.port: "3000"
+spec:
+  volumes:
+    - name: music-dl-storage
+      persistentVolumeClaim:
+        claimName: music-dl-storage
+    - name: syncthing-data
+      persistentVolumeClaim:
+        claimName: syncthing-data
+
+  containers:
+  - name: music-dl
+    image: cr.awoo.moe:10443/music_dl:latest
+    imagePullPolicy: Always
+    volumeMounts:
+      - mountPath: /app/music-dl/storage
+        name: music-dl-storage
+      - mountPath: /app/music-dl/output
+        name: syncthing-data
+    env:
+      - name: PORT
+        value: "3000"
+      - name: NODE_ENV
+        value: "production"
+      - name: HOST
+        value: "0.0.0.0"
+    ports:
+    - containerPort: 3000
+  restartPolicy: Always
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: music-dl-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: syncthing-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

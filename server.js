@@ -48,12 +48,16 @@ app.prepare().then(() => {
       }
       isVotifyRunning = true;
       try {
+        if (!fs.existsSync('output/Music')) {
+          fs.mkdirSync('output/Music', { recursive: true });
+        }
+
         const process = $`votify \
           --audio-quality aac-high \
           --wvd-path storage/device.wvd \
           --cookies-path storage/cookies.txt \
           --read-urls-as-txt \
-          --output-path output \
+          --output-path output/Music \
           --truncate 256 \
           --download-mode aria2c \
           storage/links.txt
@@ -78,8 +82,8 @@ app.prepare().then(() => {
     });
   });
 
-  server.listen(8080, (err) => {
+  server.listen(3000, '0.0.0.0', (err) => {
     if (err) throw err;
-    console.log('> Ready on http://localhost:8080');
+    console.log('> Ready on http://0.0.0.0:3000');
   });
 });

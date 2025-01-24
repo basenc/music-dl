@@ -1,0 +1,25 @@
+version: "3"
+
+tasks:
+  build:
+    cmds:
+      - podman build . -t cr.awoo.moe/music_dl:latest -t cr.awoo.moe:10443/music_dl:latest
+      - podman push cr.awoo.moe/music_dl:latest
+
+  deploy:
+    cmds:
+      - podman -c cntb kube play --network traefik --replace kube.yaml
+
+  logs:
+    cmds:
+      - podman -c cntb logs -f music-dl-music-dl
+
+  dev:
+    cmds:
+      - npm run dev
+
+  main:
+    cmds:
+      - task: build
+      - task: deploy
+      - task: logs

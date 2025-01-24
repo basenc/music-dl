@@ -16,7 +16,8 @@ tasks:
 
   dev:
     cmds:
-      - npm run dev
+      - task: build
+      - podman run -p 3000:3000 -it --rm cr.awoo.moe/music_dl:latest
 
   main:
     cmds:

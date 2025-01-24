@@ -5,7 +5,11 @@ const { Server } = require("socket.io");
 const { $ } = require("zx");
 const fs = require("node:fs");
 
-const app = next({ dev: process.env.NODE_ENV !== 'production' });
+const app = next({
+  dev: process.env.NODE_ENV !== 'production',
+  hostname: '0.0.0.0', // Add this line
+  port: 3000 // Add this line
+});
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {

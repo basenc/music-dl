@@ -5,6 +5,10 @@ const { Server } = require("socket.io");
 const { $ } = require("zx");
 const fs = require("node:fs");
 
+if (!fs.existsSync('storage')) {
+  fs.mkdirSync('storage');
+}
+
 const app = next({
   dev: process.env.NODE_ENV !== 'production',
   hostname: '0.0.0.0', // Add this line
@@ -64,6 +68,7 @@ app.prepare().then(() => {
           --output-path output/Music \
           --truncate 256 \
           --download-mode aria2c \
+          --no-config-file true \
           storage/links.txt
         `;
         process.stdout.on('data', (chunk) => {

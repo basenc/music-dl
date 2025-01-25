@@ -4,7 +4,7 @@ FROM node:20-alpine AS base
 
 ENV PATH="/root/.local/bin:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 
 RUN apk add --no-cache libc6-compat pipx aria2 ffmpeg
 RUN pipx install votify yt-dlp

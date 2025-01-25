@@ -4,6 +4,9 @@ tasks:
   build:
     cmds:
       - podman build . -t cr.awoo.moe/music_dl:latest -t cr.awoo.moe:10443/music_dl:latest
+
+  push:
+    cmds:
       - podman push cr.awoo.moe/music_dl:latest
 
   deploy:
@@ -22,5 +25,6 @@ tasks:
   main:
     cmds:
       - task: build
+      - task: push
       - task: deploy
       - task: logs

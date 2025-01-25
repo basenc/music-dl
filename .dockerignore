@@ -4,3 +4,6 @@
 next-env.d.ts
 output
 storage
+Dockerfile
+kube.yaml
+Taskfile.yml

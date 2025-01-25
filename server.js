@@ -5,10 +5,6 @@ const { Server } = require("socket.io");
 const { $ } = require("zx");
 const fs = require("node:fs");
 
-if (!fs.existsSync('storage')) {
-  fs.mkdirSync('storage');
-}
-
 const app = next({
   dev: process.env.NODE_ENV !== 'production',
   hostname: '0.0.0.0', // Add this line
@@ -60,7 +56,8 @@ app.prepare().then(() => {
           fs.mkdirSync('output/Music', { recursive: true });
         }
 
-        const process = $`votify \
+        const process = $`
+          votify \
           --audio-quality aac-high \
           --wvd-path storage/device.wvd \
           --cookies-path storage/cookies.txt \

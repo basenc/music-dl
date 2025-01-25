@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { socket } from "./socket.js";
 import { FiUpload } from "react-icons/fi";
 import { BsSpotify, BsFileEarmarkText, BsCheckLg } from "react-icons/bs";
+import Image from 'next/image'
 
 export default function Home() {
   const [logs, setLogs] = useState<string>("");

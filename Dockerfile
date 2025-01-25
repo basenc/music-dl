@@ -1,28 +1,51 @@
-# syntax=docker.io/docker/dockerfile:1
+FROM node:20-alpine AS build
 
-FROM node:20-alpine AS base
-
-ENV PATH="/root/.local/bin:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
-# ENV NODE_ENV=production
 
-RUN apk add --no-cache libc6-compat pipx aria2 ffmpeg
-RUN pipx install votify yt-dlp
+# Install required packages
+RUN apk add --no-cache libc6-compat bash
 
-WORKDIR /app
-
-COPY . .
-RUN npm ci
-RUN npm run build
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 USER nextjs
+WORKDIR /app
 
-EXPOSE 3000
+# Install dependencies and build
+COPY --chown=1001:1001 package*.json ./
+RUN npm ci
+COPY --chown=1001:1001 . .
+RUN npm run build
 
+# Final stage
+FROM node:20-alpine
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PATH="/home/nextjs/.local/bin:${PATH}"
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=production
 
-CMD ["npm", "start"]
+# Install required packages
+RUN apk add --no-cache libc6-compat python3 py3-pip aria2 ffmpeg bash
+RUN python3 -m pip install --upgrade --break-system-packages votify yt-dlp --no-cache-dir \
+    && rm -rf /root/.cache/pip
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+USER nextjs
+
+WORKDIR /app
+COPY --chown=1001:1001 --from=build /app/.next ./.next
+COPY --chown=1001:1001 --from=build /app/package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY --chown=1001:1001 --from=build /app/server.js ./
+COPY --chown=1001:1001 --from=build /app/public ./public
+
+RUN mkdir -p /app/storage /app/output
+
+EXPOSE 3000
+CMD ["node", "server.js"]

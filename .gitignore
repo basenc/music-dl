@@ -4,3 +4,7 @@
 next-env.d.ts
 output
 storage
+*.js
+!tailwind.config.js
+!postcss.config.js
+dist

@@ -26,18 +26,18 @@ export default function Home() {
     const handleConnect = () => {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
-      setLogs(logs => logs + `=== Connected via ${socket.io.engine.transport.name} ===\n`);
+      setLogs(logs => logs + `> Connected via ${socket.io.engine.transport.name}\n`);
 
       socket.io.engine.on("upgrade", (transport: { name: string }) => {
         setTransport(transport.name);
-        setLogs(logs => logs + `=== Connection upgraded to ${transport.name} ===\n`);
+        setLogs(logs => logs + `> Connection upgraded to ${transport.name}\n`);
       });
     };
 
     const handleDisconnect = () => {
       setIsConnected(false);
       setTransport("N/A");
-      setLogs(logs => logs + "\n=== Disconnected ===\n");
+      setLogs(logs => logs + "> Disconnected\n");
     };
 
     const handleLogs = (data: string) => {

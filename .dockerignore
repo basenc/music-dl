@@ -7,3 +7,7 @@ storage
 Dockerfile
 kube.yaml
 Taskfile.yml
+*.js
+!tailwind.config.js
+!postcss.config.js
+dist

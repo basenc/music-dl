@@ -20,9 +20,19 @@ app.prepare().then(() => {
 
   const io = new Server(server);
   let isVotifyRunning = false;
+  let currentController = null;
 
   io.on('connection', socket => {
     console.log('Client connected');
+
+    socket.on('kill', () => {
+      if (currentController) {
+        currentController.abort('Process killed by user');
+        currentController = null;
+        isVotifyRunning = false;
+        io.emit('logs', '\n=== Process killed by user ===\n');
+      }
+    });
 
     socket.on('start', (data) => {
       console.log('Received Widevine key: ', data.wvdFileName);
@@ -56,7 +66,8 @@ app.prepare().then(() => {
           fs.mkdirSync('output/Music', { recursive: true });
         }
 
-        const process = $`
+        currentController = new AbortController();
+        const process = $({ signal: currentController.signal })`
           votify \
           --audio-quality aac-high \
           --wvd-path storage/device.wvd \
@@ -74,8 +85,11 @@ app.prepare().then(() => {
         process.stderr.on('data', (chunk) => {
           socket.emit('logs', chunk.toString());
         });
-        process.catch(() => {}).finally(() => {
+        process.catch((err) => {
+          socket.emit('logs', `\n=== Process terminated: ${err.message} ===\n`);
+        }).finally(() => {
           isVotifyRunning = false;
+          currentController = null;
         });
       } catch (err) {
         isVotifyRunning = false;

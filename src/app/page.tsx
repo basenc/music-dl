@@ -85,6 +85,10 @@ export default function Home() {
     });
   };
 
+  const handleKill = () => {
+    socket.emit("kill");
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-7xl p-4 md:p-6 lg:p-8">
@@ -159,14 +163,23 @@ export default function Home() {
               </label>
             </div>
           </div>
-          {/* Start button */}
-          <button
-            id="votify-start"
-            className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors"
-            onClick={handleStart}
-          >
-            Start
-          </button>
+          {/* Start and Kill buttons */}
+          <div className="flex gap-3 md:gap-4">
+            <button
+              id="votify-start"
+              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors"
+              onClick={handleStart}
+            >
+              Start
+            </button>
+            <button
+              id="votify-kill"
+              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors"
+              onClick={handleKill}
+            >
+              Kill
+            </button>
+          </div>
         </div>
       </div>
     </div>

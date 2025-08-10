@@ -1,4 +1,3 @@
 {
-    "STORAGE_DIR": "storage",
-    "OUTPUT_DIR": "output/Music"
+  "OUTPUT_DIR": "/home/deck/Documents/Projects/MusicDL/storage"
 }

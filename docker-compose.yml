@@ -1,0 +1,32 @@
+services:
+  music-dl:
+    image: cr.frogs.rocks/music_dl:latest
+    container_name: music-dl
+    restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.musicdl.rule: "Host(`mdl.frogs.rocks`)"
+      traefik.http.services.musicdl.loadbalancer.server.port: "3000"
+      traefik.http.routers.musicdl.tls.certresolver: frogs_rocks
+    volumes:
+      - storage:/app/storage
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+
+volumes:
+  storage:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/mnt/pv/syncthing-data/Music
+
+configs:
+  config:
+    content: |
+      {
+        "STORAGE_DIR": "/app/storage",
+        "OUTPUT_DIR": "/app/storage/output",
+      }

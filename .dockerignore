@@ -1,13 +1,4 @@
-/node_modules
-/.next/
-.env*
-next-env.d.ts
-output
+node_modules
 storage
 Dockerfile
-kube.yaml
-Taskfile.yml
-*.js
-!tailwind.config.js
-!postcss.config.js
-dist
+Makefile

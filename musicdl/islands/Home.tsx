@@ -16,6 +16,8 @@ export default function Home() {
   const cookiesFile = useSignal<File | null>(null);
   const wvdData = useSignal<string | null>(null);
   const cookiesData = useSignal<string | null>(null);
+  const wvdName = useSignal<string | null>(null);
+  const cookiesName = useSignal<string | null>(null);
   const ansi = new AnsiUp();
 
   useEffect(() => {
@@ -37,6 +39,31 @@ export default function Home() {
       }
     });
 
+    const swd = localStorage.getItem("votify:wvdData");
+    const swn = localStorage.getItem("votify:wvdName");
+    if (swd) {
+      wvdData.value = swd;
+      if (swn) wvdName.value = swn;
+      logs.value += `> WVD file "${
+        wvdName.value || "cached"
+      }" loaded from cache\n`;
+      if (logsRef.value) {
+        logsRef.value.innerHTML = ansi.ansi_to_html(logs.value);
+      }
+    }
+    const scd = localStorage.getItem("votify:cookiesData");
+    const scn = localStorage.getItem("votify:cookiesName");
+    if (scd) {
+      cookiesData.value = scd;
+      if (scn) cookiesName.value = scn;
+      logs.value += `> Cookies file "${
+        cookiesName.value || "cached"
+      }" loaded from cache\n`;
+      if (logsRef.value) {
+        logsRef.value.innerHTML = ansi.ansi_to_html(logs.value);
+      }
+    }
+
     return () => ws.close();
   }, []);
 
@@ -48,16 +75,26 @@ export default function Home() {
       reader.readAsDataURL(file);
     });
 
-  const readWvdFile = async (file: File) => {
+  const readWvdFile = async (file: File | null) => {
+    if (!file) return;
     wvdFile.value = file;
     wvdData.value = await readAsDataURL(file);
+    wvdName.value = file.name;
+    if (wvdData.value) localStorage.setItem("votify:wvdData", wvdData.value);
+    localStorage.setItem("votify:wvdName", file.name);
     logs.value += `> WVD file "${file.name}" read successfully\n`;
     if (logsRef.value) logsRef.value.innerHTML = ansi.ansi_to_html(logs.value);
   };
 
-  const readCookiesFile = async (file: File) => {
+  const readCookiesFile = async (file: File | null) => {
+    if (!file) return;
     cookiesFile.value = file;
     cookiesData.value = await readAsDataURL(file);
+    cookiesName.value = file.name;
+    if (cookiesData.value) {
+      localStorage.setItem("votify:cookiesData", cookiesData.value);
+    }
+    localStorage.setItem("votify:cookiesName", file.name);
     logs.value += `> Cookies file "${file.name}" read successfully\n`;
     if (logsRef.value) logsRef.value.innerHTML = ansi.ansi_to_html(logs.value);
   };
@@ -103,7 +140,7 @@ export default function Home() {
           <div className="border-2 border-solid">
             <textarea
               id="votify-links"
-              className="text-xs w-full min-h-[16rem] md:min-h-[20rem] lg:min-h-[24rem] p-2 md:p-3 resize-none no-scrollbar"
+              className="text-xs w-full min-h-[16rem] md:min-h-[20rem] lg:min-h-[24rem] p-2 md:p-3 resize-none no-scrollbar outline-none focus:ring-2 focus:ring-[var(--foreground)] focus:border-[var(--foreground)]"
               placeholder="Enter Spotify playlist links..."
               autoFocus
               value={links.value}
@@ -129,11 +166,14 @@ export default function Home() {
               />
               <label
                 htmlFor="votify-wvd"
-                className="flex items-center gap-2 p-3 md:p-4 border-2 border-solid rounded cursor-pointer hover:bg-gray-50 transition-colors"
+                tabIndex={0}
+                className="flex items-center gap-2 p-3 md:p-4 border-2 border-solid rounded cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] focus:ring-offset-2"
               >
                 <Fa icon={faFileText} />
                 <span className="truncate">
-                  {wvdFile.value ? wvdFile.value.name : ".wvd"}
+                  {wvdFile.value
+                    ? wvdFile.value.name
+                    : (wvdName.value || ".wvd")}
                 </span>
               </label>
             </div>
@@ -148,11 +188,14 @@ export default function Home() {
               />
               <label
                 htmlFor="votify-cookies"
-                className="flex items-center gap-2 p-3 md:p-4 border-2 border-solid rounded cursor-pointer hover:bg-gray-50 transition-colors"
+                tabIndex={0}
+                className="flex items-center gap-2 p-3 md:p-4 border-2 border-solid rounded cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] focus:ring-offset-2"
               >
                 <Fa icon={faFileText} />
                 <span className="truncate">
-                  {cookiesFile.value ? cookiesFile.value.name : ".txt"}
+                  {cookiesFile.value
+                    ? cookiesFile.value.name
+                    : (cookiesName.value || ".txt")}
                 </span>
               </label>
             </div>
@@ -161,7 +204,7 @@ export default function Home() {
             <button
               id="votify-start"
               type="button"
-              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors"
+              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] focus:ring-offset-2"
               onClick={handleStart}
             >
               <Fa icon={faPlay} /> Start
@@ -169,7 +212,7 @@ export default function Home() {
             <button
               id="votify-kill"
               type="button"
-              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors"
+              className="w-full p-3 md:p-4 border-2 border-solid hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--foreground)] focus:ring-offset-2"
               onClick={handleKill}
             >
               <Fa icon={faStop} /> Kill

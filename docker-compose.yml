@@ -3,16 +3,19 @@ services:
     image: cr.frogs.rocks/music_dl:latest
     container_name: music-dl
     restart: always
+    pull_policy: always
     labels:
       traefik.enable: "true"
       traefik.http.routers.musicdl.rule: "Host(`mdl.frogs.rocks`)"
-      traefik.http.services.musicdl.loadbalancer.server.port: "3000"
+      traefik.http.services.musicdl.loadbalancer.server.port: "8000"
       traefik.http.routers.musicdl.tls.certresolver: frogs_rocks
     volumes:
       - storage:/app/storage
+    configs:
+      - source: config
+        target: /config.json
     environment:
-      - PORT=3000
-      - NODE_ENV=production
+      - PORT=8000
       - HOST=0.0.0.0
 
 volumes:
@@ -27,6 +30,5 @@ configs:
   config:
     content: |
       {
-        "STORAGE_DIR": "/app/storage",
-        "OUTPUT_DIR": "/app/storage/output",
+        "OUTPUT_DIR": "/app/storage"
       }
